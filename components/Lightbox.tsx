@@ -21,18 +21,62 @@ const Lightbox: React.FC<LightboxProps> = ({ images, selectedIndex, onClose, onN
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, onNext, onPrev]);
 
+  const handleDownload = async () => {
+    try {
+        const imageUrl = images[selectedIndex];
+        // Fetch the image as a blob to bypass potential CORS issues with direct download
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        
+        // Create a temporary link to trigger the download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        
+        // Extract a clean filename from the URL
+        const fileName = imageUrl.split('/').pop()?.split('?')[0]?.replace('thumb_', '') || 'download';
+        a.download = fileName;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up the temporary URL and link
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error("Error downloading image:", error);
+        // As a fallback, open the image in a new tab
+        window.open(images[selectedIndex], '_blank');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center backdrop-blur-sm animate-fade-in">
-      {/* Close Button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-20"
-        aria-label="Cerrar"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      {/* Controls Container */}
+      <div className="absolute top-4 right-4 flex items-center gap-4 z-20">
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="text-white/70 hover:text-white transition-colors"
+          aria-label="Descargar imagen"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+        </button>
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="text-white/70 hover:text-white transition-colors"
+          aria-label="Cerrar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       {/* Navigation Buttons */}
       <button

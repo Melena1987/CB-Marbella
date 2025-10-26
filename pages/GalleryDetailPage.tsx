@@ -5,10 +5,15 @@ import { db } from '../firebase';
 import AnimatedContent from '../components/AnimatedContent';
 import Lightbox from '../components/Lightbox';
 
+interface GalleryImage {
+  original: string;
+  thumbnail: string;
+}
+
 interface GalleryItem {
   id: string;
   title: string;
-  images: string[];
+  images: GalleryImage[];
   createdAt: Timestamp;
 }
 
@@ -81,13 +86,13 @@ const GalleryDetailPage: React.FC = () => {
         </AnimatedContent>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {gallery.images.map((imgUrl, index) => (
+          {gallery.images.map((img, index) => (
             <AnimatedContent key={index} style={{ animationDelay: `${index * 50}ms` }}>
               <div 
                 className="aspect-square bg-[#061121] rounded-lg overflow-hidden cursor-pointer group"
                 onClick={() => openLightbox(index)}
                 >
-                <img src={imgUrl} alt={`${gallery.title} - ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                <img src={img.thumbnail} alt={`${gallery.title} - ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
               </div>
             </AnimatedContent>
           ))}
@@ -96,7 +101,7 @@ const GalleryDetailPage: React.FC = () => {
       
       {lightboxOpen && (
           <Lightbox 
-            images={gallery.images}
+            images={gallery.images.map(img => img.original)}
             selectedIndex={selectedImage}
             onClose={() => setLightboxOpen(false)}
             onNext={() => setSelectedImage((prev) => (prev + 1) % gallery.images.length)}

@@ -8,6 +8,42 @@ interface CreateGalleryModalProps {
   onClose: () => void;
 }
 
+// Helper function to resize images to create thumbnails
+const resizeImage = (file: File, maxWidth: number): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      if (event.target?.result) {
+        img.src = event.target.result as string;
+      } else {
+        return reject(new Error('Failed to read file.'));
+      }
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = maxWidth / img.width;
+        canvas.width = maxWidth;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Could not get canvas context'));
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Canvas to Blob conversion failed'));
+          }
+        }, 'image/jpeg', 0.8); // 80% quality JPEG
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 const CreateGalleryModal: React.FC<CreateGalleryModalProps> = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -16,13 +52,9 @@ const CreateGalleryModal: React.FC<CreateGalleryModalProps> = ({ isOpen, onClose
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      // FIX: Cast Array.from(e.target.files) to File[] to ensure correct type inference.
-      // This resolves errors where properties on 'file' and 'newFile' were inaccessible.
       const newFiles = (Array.from(e.target.files) as File[]).filter(file => file.type.startsWith('image/'));
-      // A simple way to avoid duplicates
       const uniqueNewFiles = newFiles.filter(newFile => !files.some(existingFile => existingFile.name === newFile.name && existingFile.size === newFile.size));
       setFiles(prev => [...prev, ...uniqueNewFiles]);
-      // Reset the input value to allow selecting the same file again after removing it
       e.target.value = '';
     }
   };
@@ -52,16 +84,27 @@ const CreateGalleryModal: React.FC<CreateGalleryModalProps> = ({ isOpen, onClose
     
     setIsUploading(true);
     setError('');
-    const galleryId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const galleryId = `${Date.now()}-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
     try {
-      const imageUrls = await Promise.all(
-        files.map(async file => {
-          const storageRef = ref(storage, `galleries/${galleryId}/${file.name}`);
-          await uploadBytes(storageRef, file);
-          return await getDownloadURL(storageRef);
-        })
-      );
+      const imageUploadPromises = files.map(async (file) => {
+        // 1. Create thumbnail (400px width)
+        const thumbnailBlob = await resizeImage(file, 400);
+
+        // 2. Upload original image
+        const originalStorageRef = ref(storage, `galleries/${galleryId}/${file.name}`);
+        await uploadBytes(originalStorageRef, file);
+        const originalUrl = await getDownloadURL(originalStorageRef);
+
+        // 3. Upload thumbnail
+        const thumbnailStorageRef = ref(storage, `galleries/${galleryId}/thumb_${file.name}`);
+        await uploadBytes(thumbnailStorageRef, thumbnailBlob);
+        const thumbnailUrl = await getDownloadURL(thumbnailStorageRef);
+
+        return { original: originalUrl, thumbnail: thumbnailUrl };
+      });
+      
+      const imageUrls = await Promise.all(imageUploadPromises);
 
       await addDoc(collection(db, 'galleries'), {
         title: title,
