@@ -84,7 +84,15 @@ const CreateGalleryModal: React.FC<CreateGalleryModalProps> = ({ isOpen, onClose
     
     setIsUploading(true);
     setError('');
-    const galleryId = `${Date.now()}-${title.replace(/\s+/g, '-').toLowerCase()}`;
+    
+    // Create a URL-friendly slug from the title
+    const slug = title.trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // remove non-word chars
+      .replace(/[\s_-]+/g, '-') // swap spaces for hyphens
+      .replace(/^-+|-+$/g, ''); // remove leading/trailing hyphens
+
+    const galleryId = `${Date.now()}-${slug}`;
 
     try {
       const imageUploadPromises = files.map(async (file) => {
@@ -108,6 +116,7 @@ const CreateGalleryModal: React.FC<CreateGalleryModalProps> = ({ isOpen, onClose
 
       await addDoc(collection(db, 'galleries'), {
         title: title,
+        slug: slug,
         images: imageUrls,
         createdAt: serverTimestamp(),
       });

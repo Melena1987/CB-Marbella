@@ -15,12 +15,13 @@ interface GalleryImage {
 interface GalleryItem {
   id: string; // Firestore document ID
   title: string;
+  slug: string;
   images: GalleryImage[]; // Array of image objects
 }
 
 // --- Card Component for Displaying a Gallery ---
 const GalleryCard: React.FC<{ item: GalleryItem }> = ({ item }) => (
-    <Link to={`/galeria/${item.id}`} className="block group overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
+    <Link to={`/galeria/${item.slug}`} className="block group overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
       <div className="overflow-hidden aspect-square">
         <img src={item.images[0]?.thumbnail || item.images[0]?.original} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
       </div>

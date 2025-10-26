@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import AnimatedContent from '../components/AnimatedContent';
 import Lightbox from '../components/Lightbox';
@@ -15,10 +15,11 @@ interface GalleryItem {
   title: string;
   images: GalleryImage[];
   createdAt: Timestamp;
+  slug: string;
 }
 
 const GalleryDetailPage: React.FC = () => {
-  const { galleryId } = useParams<{ galleryId: string }>();
+  const { gallerySlug } = useParams<{ gallerySlug: string }>();
   const [gallery, setGallery] = useState<GalleryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,17 +28,19 @@ const GalleryDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchGallery = async () => {
-      if (!galleryId) {
-        setError('ID de galería no válido.');
+      if (!gallerySlug) {
+        setError('URL de galería no válida.');
         setLoading(false);
         return;
       }
 
       try {
-        const docRef = doc(db, 'galleries', galleryId);
-        const docSnap = await getDoc(docRef);
+        const galleriesRef = collection(db, 'galleries');
+        const q = query(galleriesRef, where("slug", "==", gallerySlug), limit(1));
+        const querySnapshot = await getDocs(q);
 
-        if (docSnap.exists()) {
+        if (!querySnapshot.empty) {
+          const docSnap = querySnapshot.docs[0];
           setGallery({ id: docSnap.id, ...docSnap.data() } as GalleryItem);
         } else {
           setError('No se ha encontrado la galería.');
@@ -51,7 +54,7 @@ const GalleryDetailPage: React.FC = () => {
     };
 
     fetchGallery();
-  }, [galleryId]);
+  }, [gallerySlug]);
   
   const openLightbox = (index: number) => {
       setSelectedImage(index);
