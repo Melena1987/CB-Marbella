@@ -12,6 +12,7 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [excerpt, setExcerpt] = useState('');
+  const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
@@ -31,6 +32,7 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
     setTitle('');
     setCategory('');
     setExcerpt('');
+    setContent('');
     setImageFile(null);
     setError('');
     setIsUploading(false);
@@ -43,7 +45,7 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !category.trim() || !excerpt.trim() || !imageFile) {
+    if (!title.trim() || !category.trim() || !excerpt.trim() || !content.trim() || !imageFile) {
       setError('Todos los campos y la imagen son obligatorios.');
       return;
     }
@@ -52,6 +54,12 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
     setError('');
 
     try {
+      const slug = title.trim()
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
       // 1. Upload image
       const imageRef = ref(storage, `news-images/${Date.now()}-${imageFile.name}`);
       await uploadBytes(imageRef, imageFile);
@@ -60,8 +68,10 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
       // 2. Add document to Firestore
       await addDoc(collection(db, 'news'), {
         title,
+        slug,
         category,
         excerpt,
+        content,
         image: imageUrl,
         createdAt: serverTimestamp(),
       });
@@ -119,6 +129,18 @@ const CreateNewsModal: React.FC<CreateNewsModalProps> = ({ isOpen, onClose }) =>
               value={excerpt} 
               onChange={(e) => setExcerpt(e.target.value)} 
               className="w-full bg-[#0a192f] border border-slate-700 rounded-md py-2 px-4 text-white focus:ring-2 focus:ring-[#003782] focus:border-[#003782] transition"
+              required
+            ></textarea>
+          </div>
+           <div>
+            <label htmlFor="news-content" className="block text-sm font-medium text-slate-300 mb-1">Contenido Completo</label>
+            <textarea
+              id="news-content"
+              rows={6}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full bg-[#0a192f] border border-slate-700 rounded-md py-2 px-4 text-white focus:ring-2 focus:ring-[#003782] focus:border-[#003782] transition"
+              placeholder="Escribe el contenido. Puedes usar HTML (ej: <p>, <b>, <ul>)."
               required
             ></textarea>
           </div>

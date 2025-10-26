@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import NewsPage from './pages/NewsPage';
+import NewsDetailPage from './pages/NewsDetailPage';
 import ClubPage from './pages/ClubPage';
 import SubscribePage from './pages/SubscribePage';
 import SponsorshipPage from './pages/SponsorshipPage';
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/noticias" element={<NewsPage />} />
+            <Route path="/noticias/:newsSlug" element={<NewsDetailPage />} />
             <Route path="/el-club" element={<ClubPage />} />
             <Route path="/instalaciones" element={<FacilitiesPage />} />
             <Route path="/plantilla" element={<RosterPage />} />
