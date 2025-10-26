@@ -4,7 +4,7 @@ import AnimatedContent from './AnimatedContent';
 // Logos extracted from the provided images. 
 // For better quality, replace these with original assets in a public/assets folder.
 const jaenLogoUrl = 'https://imagenes.feb.es/Imagen.aspx?i=981448&ti=1'; 
-const marbellaLogoUrl = 'https://i.imgur.com/B7lS5d9.png';
+const marbellaLogoUrl = 'https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2FCBMarbella%20logo.png?alt=media&token=27643f10-e2f1-47c9-96d6-29afacaae12f';
 
 const matchData = {
   homeTeam: {
@@ -58,7 +58,7 @@ const NextMatch: React.FC = () => {
                 <h3 className="text-lg md:text-2xl font-bold font-['Teko'] uppercase text-right hidden sm:block" style={{ color: teamNameColor }}>
                   {matchData.awayTeam.name}
                 </h3>
-                <img src={matchData.awayTeam.name} alt={`${matchData.awayTeam.name} logo`} className="w-16 h-16 md:w-24 md:h-24 object-contain" />
+                <img src={matchData.awayTeam.logo} alt={`${matchData.awayTeam.name} logo`} className="w-16 h-16 md:w-24 md:h-24 object-contain" />
               </div>
             </div>
             
