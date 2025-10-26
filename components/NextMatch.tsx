@@ -24,6 +24,42 @@ const matchData = {
 const NextMatch: React.FC = () => {
   const teamNameColor = '#c51e3a';
   const vsColor = '#ef4444'; // A bright red, similar to Tailwind's red-500
+  
+  const generateGoogleCalendarLink = () => {
+    const { homeTeam, awayTeam, date, referees, venue, location } = matchData;
+
+    // Parse date: '02/11/2025 - 18:30'
+    const [datePart, timePart] = date.split(' - ');
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+
+    // Note: Month is 0-indexed in JavaScript Date
+    const startDate = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes));
+    
+    // Assume a 2-hour duration
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+
+    // Format to ISO string and remove separators for Google Calendar URL (YYYYMMDDTHHMMSSZ)
+    const formatDate = (d: Date) => d.toISOString().replace(/[-:.]/g, '').slice(0, -4) + 'Z';
+
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+
+    const eventTitle = `Partido: ${homeTeam.name} vs ${awayTeam.name}`;
+    const eventDetails = `Árbitros: ${referees.join(' y ')}.`;
+    const eventLocation = `${venue}, ${location}`;
+
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: eventTitle,
+      dates: `${formattedStartDate}/${formattedEndDate}`,
+      details: eventDetails,
+      location: eventLocation,
+    });
+
+    return `https://www.google.com/calendar/render?${params.toString()}`;
+  };
+
 
   return (
     <section className="bg-[#061121] py-12 md:py-20">
@@ -84,6 +120,22 @@ const NextMatch: React.FC = () => {
                   <span className="bg-slate-800/50 px-3 py-2 flex-1">{`${matchData.venue}, ${matchData.location}`}</span>
                </div>
             </div>
+
+            {/* Add to Calendar Button */}
+            <div className="mt-8 text-center">
+                <a
+                    href={generateGoogleCalendarLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#003782]/80 hover:bg-[#003782] text-white rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a192f] focus:ring-[#003782] text-sm shadow-lg"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                    </svg>
+                    <span>Añadir al Calendario</span>
+                </a>
+            </div>
+
           </div>
         </AnimatedContent>
       </div>

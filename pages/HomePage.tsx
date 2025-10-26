@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimatedContent from '../components/AnimatedContent';
 import { Link } from 'react-router-dom';
 import NextMatch from '../components/NextMatch';
-import NewsCard from '../components/NewsCard';
+import NewsCard, { NewsCardProps } from '../components/NewsCard';
 import SponsorsSection from '../components/SponsorsSection';
+import { db } from '../firebase';
+import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 const HeroSection: React.FC = () => (
   <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
@@ -135,36 +137,56 @@ const StandingsSection: React.FC = () => (
   </div>
 );
 
-const latestNewsItem = {
-  image: 'https://picsum.photos/seed/news1/400/500',
-  category: 'Primer Equipo',
-  title: 'Victoria clave en casa para cerrar la jornada',
-  excerpt: 'El equipo senior consigue una victoria crucial en un partido vibrante...',
-  date: '15 OCT 2024',
-};
+const LatestNewsSection: React.FC = () => {
+  const [latestNews, setLatestNews] = useState<NewsCardProps | null>(null);
 
-const LatestNewsSection: React.FC = () => (
-  <div className="py-12 md:py-20 bg-[#0a192f]">
-    <div className="container mx-auto px-4">
-      <AnimatedContent>
-        <h2 className="text-5xl md:text-6xl font-bold uppercase text-white font-['Teko'] mb-8 text-center leading-tight">
-          Última Noticia
-        </h2>
-        <div className="max-w-4xl mx-auto">
-          <NewsCard {...latestNewsItem} />
-        </div>
-        <div className="text-center mt-12">
-          <Link
-            to="/noticias"
-            className="inline-block bg-transparent border-2 border-[#003782] hover:bg-[#003782] text-white font-bold py-3 px-8 rounded-full text-lg uppercase tracking-wider transition-all duration-300 transform hover:scale-105"
-          >
-            Ver todas las noticias
-          </Link>
-        </div>
-      </AnimatedContent>
+  useEffect(() => {
+    const newsCollection = collection(db, "news");
+    const q = query(newsCollection, orderBy("createdAt", "desc"), limit(1));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        setLatestNews({
+          id: doc.id,
+          ...doc.data(),
+          date: doc.data().createdAt?.toDate().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase().replace(/\./g, '') || new Date().toLocaleDateString()
+        } as NewsCardProps);
+      } else {
+        setLatestNews(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return (
+    <div className="py-12 md:py-20 bg-[#0a192f]">
+      <div className="container mx-auto px-4">
+        <AnimatedContent>
+          <h2 className="text-5xl md:text-6xl font-bold uppercase text-white font-['Teko'] mb-8 text-center leading-tight">
+            Última Noticia
+          </h2>
+          {latestNews ? (
+            <div className="max-w-4xl mx-auto">
+              <NewsCard {...latestNews} />
+            </div>
+          ) : (
+             <p className="text-center text-slate-400">No hay noticias recientes.</p>
+          )}
+          <div className="text-center mt-12">
+            <Link
+              to="/noticias"
+              className="inline-block bg-transparent border-2 border-[#003782] hover:bg-[#003782] text-white font-bold py-3 px-8 rounded-full text-lg uppercase tracking-wider transition-all duration-300 transform hover:scale-105"
+            >
+              Ver todas las noticias
+            </Link>
+          </div>
+        </AnimatedContent>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 
 const HomePage: React.FC = () => {
