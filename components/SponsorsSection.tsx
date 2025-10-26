@@ -77,14 +77,18 @@ const SponsorsSection: React.FC = () => {
         
         {/* Main Sponsors Section */}
         {mainSponsors.length > 0 && (
-            <AnimatedContent className="mb-16">
-                 <div className="flex justify-center items-center gap-12 md:gap-20 flex-wrap">
+            <AnimatedContent className="mb-20">
+                 <div className="flex justify-center items-start gap-12 md:gap-20 flex-wrap">
                     {mainSponsors.map((sponsor) => (
-                        <div key={sponsor.id} className="flex justify-center">
+                        <div key={sponsor.id} className="flex flex-col items-center gap-3">
+                             <p className="text-center text-sm uppercase tracking-widest text-slate-400">
+                                {sponsor.logoUrl === namingSponsorUrl && 'Naming Sponsor'}
+                                {sponsor.logoUrl === mainSponsorUrl && 'Main Sponsor'}
+                            </p>
                             <img 
                             src={sponsor.logoUrl}
                             alt={sponsor.name} 
-                            className="opacity-90 hover:opacity-100 transition-opacity duration-300 object-contain h-28 md:h-32 mx-auto"
+                            className="opacity-90 hover:opacity-100 transition-opacity duration-300 object-contain h-40 md:h-48 mx-auto"
                             />
                         </div>
                     ))}
