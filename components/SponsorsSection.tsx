@@ -67,7 +67,7 @@ const SponsorsSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-[#0a192f]">
+    <section className="py-12 md:py-20 bg-[#0a192f]">
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       <UploadLogoModal 
         isOpen={isUploadModalOpen} 
@@ -77,7 +77,7 @@ const SponsorsSection: React.FC = () => {
         
         {/* Main Sponsors Section */}
         {mainSponsors.length > 0 && (
-            <AnimatedContent className="mb-20">
+            <AnimatedContent className="mb-12 md:mb-16">
                  <div className="flex justify-center items-start gap-12 md:gap-20 flex-wrap">
                     {mainSponsors.map((sponsor) => (
                         <div key={sponsor.id} className="flex flex-col items-center gap-3">
@@ -96,7 +96,7 @@ const SponsorsSection: React.FC = () => {
             </AnimatedContent>
         )}
 
-        <AnimatedContent className="text-center mb-12">
+        <AnimatedContent className="text-center mb-10">
           <h2 className="text-5xl md:text-6xl font-bold text-white uppercase font-['Teko'] mb-4 tracking-wider">Nuestros Patrocinadores Oficiales</h2>
           <p className="text-slate-400 max-w-2xl mx-auto">Un agradecimiento especial a las empresas que hacen posible nuestro proyecto.</p>
         </AnimatedContent>

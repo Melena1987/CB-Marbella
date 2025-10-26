@@ -46,7 +46,7 @@ const ContentSection: React.FC<{
   const imageOrder = imagePosition === 'right' ? 'md:order-last' : '';
 
   return (
-    <div className="container mx-auto px-4 py-16 md:py-24">
+    <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="flex flex-col md:flex-row items-stretch min-h-[70vh] gap-8">
         <div className={`md:w-1/2 flex items-center justify-center ${imageOrder}`}>
            <AnimatedContent className="w-full">
@@ -86,7 +86,7 @@ const standingsData = [
 ];
 
 const StandingsSection: React.FC = () => (
-  <div className="py-16 md:py-24 bg-[#061121]">
+  <div className="py-12 md:py-20 bg-[#061121]">
     <div className="container mx-auto px-4">
       <AnimatedContent>
         <div className="flex justify-center items-center gap-4 mb-8">
@@ -144,7 +144,7 @@ const latestNewsItem = {
 };
 
 const LatestNewsSection: React.FC = () => (
-  <div className="py-16 md:py-24 bg-[#0a192f]">
+  <div className="py-12 md:py-20 bg-[#0a192f]">
     <div className="container mx-auto px-4">
       <AnimatedContent>
         <h2 className="text-5xl md:text-6xl font-bold uppercase text-white font-['Teko'] mb-8 text-center leading-tight">

@@ -26,7 +26,7 @@ const NextMatch: React.FC = () => {
   const vsColor = '#ef4444'; // A bright red, similar to Tailwind's red-500
 
   return (
-    <section className="bg-[#061121] py-16 md:py-24">
+    <section className="bg-[#061121] py-12 md:py-20">
       <div className="container mx-auto px-4">
         <AnimatedContent>
           <h2 className="text-5xl md:text-6xl font-bold uppercase text-white font-['Teko'] mb-8 text-center leading-tight">
@@ -58,7 +58,7 @@ const NextMatch: React.FC = () => {
                 <h3 className="text-lg md:text-2xl font-bold font-['Teko'] uppercase text-right hidden sm:block" style={{ color: teamNameColor }}>
                   {matchData.awayTeam.name}
                 </h3>
-                <img src={matchData.awayTeam.logo} alt={`${matchData.awayTeam.name} logo`} className="w-16 h-16 md:w-24 md:h-24 object-contain" />
+                <img src={matchData.awayTeam.name} alt={`${matchData.awayTeam.name} logo`} className="w-16 h-16 md:w-24 md:h-24 object-contain" />
               </div>
             </div>
             

@@ -47,7 +47,7 @@ const SponsorshipPage: React.FC = () => {
       <div className="container mx-auto px-4 pb-16">
         
         {/* Section: Tradition and Future */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedContent>
               <h2 className="text-4xl md:text-5xl font-bold text-white font-['Teko'] mb-4 border-l-4 border-[#003782] pl-4">Tradición y Futuro: La Historia del CB Marbella</h2>
@@ -69,7 +69,7 @@ const SponsorshipPage: React.FC = () => {
         </section>
 
         {/* Section: Maximize Visibility */}
-        <section className="py-16 bg-[#061121] rounded-lg my-12 p-8 md:p-12">
+        <section className="py-12 bg-[#061121] rounded-lg my-12 p-8 md:p-12">
             <AnimatedContent className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-bold text-white font-['Teko'] mb-4">Maximiza tu Visibilidad con CB Marbella</h2>
                 <p className="text-slate-400 max-w-3xl mx-auto">Nuestros socios gozan de una presencia destacada en cada juego y evento, conectando su imagen a la energía y la pasión que solo el deporte puede ofrecer.</p>
@@ -100,7 +100,7 @@ const SponsorshipPage: React.FC = () => {
         </section>
         
         {/* Section: Digital Presence */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedContent className="md:order-last">
               <h2 className="text-4xl md:text-5xl font-bold text-white font-['Teko'] mb-4 border-l-4 border-[#003782] pl-4">Presencia Digital: Amplifica tu Marca</h2>
@@ -121,7 +121,7 @@ const SponsorshipPage: React.FC = () => {
         </section>
 
         {/* Section: Plans & VIP Access */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
               <AnimatedContent>
                 <img src="https://picsum.photos/seed/vip-access/800/600" alt="Acceso VIP" className="rounded-lg shadow-2xl"/>
