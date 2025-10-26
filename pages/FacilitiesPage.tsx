@@ -14,7 +14,7 @@ const FacilitiesPage: React.FC = () => {
         
         <AnimatedContent>
           <img 
-            src="https://picsum.photos/seed/bello-horizonte/1200/500" 
+            src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2Fcarlos%20cabezas.jpg?alt=media&token=c0f09af7-1187-4164-9b8f-17b303096ed7" 
             alt='Polideportivo Bello Horizonte "Carlos Cabezas"' 
             className="w-full h-auto object-cover rounded-lg shadow-2xl mb-16"
           />
