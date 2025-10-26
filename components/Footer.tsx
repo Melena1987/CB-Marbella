@@ -32,12 +32,8 @@ const Footer: React.FC = () => {
                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.149-4.771-1.664-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802c-3.14 0-3.483.011-4.71.069-2.628.12-3.834 1.328-3.953 3.953-.058 1.226-.069 1.569-.069 4.71s.011 3.483.069 4.71c.119 2.625 1.325 3.833 3.953 3.953 1.227.058 1.57.069 4.71.069s3.483-.011 4.71-.069c2.628-.12 3.833-1.328 3.953-3.953.058-1.226.069-1.569.069-4.71s-.011-3.483-.069-4.71c-.12-2.625-1.325-3.833-3.953-3.953-1.227-.058-1.57-.069-4.71-.069zM12 8.358a3.642 3.642 0 100 7.284 3.642 3.642 0 000-7.284zM12 14a2 2 0 110-4 2 2 0 010 4zm6.406-7.874a1.2 1.2 0 100-2.4 1.2 1.2 0 000 2.4z" />
                 </svg>
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white transition-colors duration-300" aria-label="Telegram">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                    <path d="M20 3H4a1 1 0 00-1 1v16a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1zm-1 16H5V5h14v14z"/>
-                    <path d="M8.5 8h5v1.5h-1.75v6.5h-1.5V9.5H8.5V8z"/>
-                    <path d="M17.4 13.91c0 .85-.6 1.59-1.8 1.59h-2.1V8h2.3c1.2 0 1.8.7 1.8 1.62v.56c0 .6-.2 1-.6 1.2.5.2.7.7.7 1.53v0z M14.8 9.3v1.9h.8c.4 0 .6-.3.6-.8s-.2-.8-.6-.8h-.8zm0 3.2v2.2h.9c.5 0 .8-.4.8-.9s-.3-1.3-.8-1.3h-.9z"/>
-                </svg>
+            <a href="#" target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white transition-colors duration-300" aria-label="Te vienes">
+                <img src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2FTevienes.com%20blanco%20.png?alt=media&token=e5c2dd55-fadd-45b1-b000-c3e36bcccbba" alt="Te vienes" className="w-6 h-6" />
             </a>
         </div>
         

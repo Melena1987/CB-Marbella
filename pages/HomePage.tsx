@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AnimatedContent from '../components/AnimatedContent';
 import { Link } from 'react-router-dom';
 import NextMatch from '../components/NextMatch';
 import NewsCard from '../components/NewsCard';
+import LoginModal from '../components/LoginModal';
 
 const HeroSection: React.FC = () => (
   <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
@@ -45,29 +46,44 @@ const sponsors = [
     { name: 'Show Time Sport MKT', seed: 'showtime' },
 ];
 
-const SponsorsSection: React.FC = () => (
-  <section className="py-16 md:py-24 bg-[#0a192f]">
-    <div className="container mx-auto px-4">
-      <AnimatedContent className="text-center mb-12">
-        <h2 className="text-5xl md:text-6xl font-bold text-white uppercase font-['Teko'] mb-4 tracking-wider">Nuestros Patrocinadores Oficiales</h2>
-        <p className="text-slate-400 max-w-2xl mx-auto">Un agradecimiento especial a las empresas que hacen posible nuestro proyecto.</p>
-      </AnimatedContent>
-      <AnimatedContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center max-w-5xl mx-auto">
-          {sponsors.map((sponsor) => (
-            <div key={sponsor.seed} className="flex justify-center">
-              <img 
-                src={`https://picsum.photos/seed/${sponsor.seed}/200/100?grayscale`} 
-                alt={sponsor.name} 
-                className="opacity-60 hover:opacity-100 transition-opacity duration-300"
-              />
-            </div>
-          ))}
-        </div>
-      </AnimatedContent>
-    </div>
-  </section>
-);
+const SponsorsSection: React.FC = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  return (
+    <section className="py-16 md:py-24 bg-[#0a192f]">
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <div className="container mx-auto px-4">
+        <AnimatedContent className="text-center mb-12">
+          <h2 className="text-5xl md:text-6xl font-bold text-white uppercase font-['Teko'] mb-4 tracking-wider">Nuestros Patrocinadores Oficiales</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">Un agradecimiento especial a las empresas que hacen posible nuestro proyecto.</p>
+        </AnimatedContent>
+        <AnimatedContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center max-w-5xl mx-auto">
+            {sponsors.map((sponsor) => (
+              <div key={sponsor.seed} className="flex justify-center">
+                <img 
+                  src={`https://picsum.photos/seed/${sponsor.seed}/200/100?grayscale`} 
+                  alt={sponsor.name} 
+                  className="opacity-60 hover:opacity-100 transition-opacity duration-300"
+                />
+              </div>
+            ))}
+            {/* Add Sponsor Button */}
+            <button 
+              onClick={() => setIsLoginModalOpen(true)}
+              className="flex items-center justify-center h-full aspect-[2/1] border-2 border-dashed border-slate-700 rounded-lg text-slate-600 hover:border-slate-500 hover:text-slate-400 transition-colors duration-300"
+              aria-label="Añadir logo de patrocinador"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
+        </AnimatedContent>
+      </div>
+    </section>
+  );
+};
 
 
 const ContentSection: React.FC<{

@@ -1,6 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AnimatedContent from '../components/AnimatedContent';
 import { Link } from 'react-router-dom';
+import LoginModal from '../components/LoginModal';
+
+// New Hero Section for Sponsorship Page
+const SponsorshipHeroSection: React.FC = () => (
+  <section className="relative h-[60vh] flex items-center justify-center text-white overflow-hidden bg-black">
+    <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
+    <img
+      src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2F20230930_184230.jpg?alt=media&token=c80b8bfd-0c07-4b01-bb56-d0da3787dd2d"
+      alt="Equipo de CB Marbella en la cancha"
+      className="absolute z-0 w-full h-full object-cover"
+    />
+    <div className="relative z-20 text-center px-4 container mx-auto">
+      <AnimatedContent>
+        <h1 className="text-6xl md:text-8xl font-extrabold text-white uppercase font-['Teko'] tracking-wide">
+          Patrocinio
+        </h1>
+        <p className="mt-4 max-w-4xl mx-auto text-lg md:text-xl text-slate-200">
+          Únete a la vibrante comunidad de empresas que apuestan por el deporte, el crecimiento local y la excelencia. Al patrocinar al CB Marbella, te integras en un colectivo de marcas de renombre que son sinónimo de compromiso y pasión.
+        </p>
+      </AnimatedContent>
+    </div>
+  </section>
+);
+
 
 const FeatureIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span className="text-[#003782] mr-3 mt-1 flex-shrink-0">{children}</span>
@@ -16,6 +40,7 @@ const ContactButton: React.FC = () => (
 );
 
 const SponsorshipPage: React.FC = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const sponsors = [
     { name: 'Hospital Ochoa', seed: 'ochoa' },
     { name: 'Sponsor 2', seed: 'sponsor2' },
@@ -26,16 +51,11 @@ const SponsorshipPage: React.FC = () => {
   ];
 
   return (
-    <div className="pt-24 pb-16 bg-[#0a192f]">
-      <div className="container mx-auto px-4">
-        {/* Main Header */}
-        <AnimatedContent>
-          <h1 className="text-6xl md:text-7xl font-bold text-center text-white uppercase font-['Teko'] mb-4">Patrocinio</h1>
-          <p className="text-lg text-slate-400 text-center max-w-4xl mx-auto mb-16">
-            Únete a la vibrante comunidad de empresas que apuestan por el deporte, el crecimiento local y la excelencia. Al patrocinar al CB Marbella, te integras en un colectivo de marcas de renombre que son sinónimo de compromiso y pasión.
-          </p>
-        </AnimatedContent>
-
+    <div className="bg-[#0a192f]">
+      <SponsorshipHeroSection />
+      
+      <div className="container mx-auto px-4 pb-16">
+        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
         {/* Section: Tradition and Future */}
         <section className="py-16">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -146,6 +166,16 @@ const SponsorshipPage: React.FC = () => {
                             />
                         </div>
                     ))}
+                    {/* Add Sponsor Button */}
+                    <button 
+                      onClick={() => setIsLoginModalOpen(true)}
+                      className="flex items-center justify-center h-full aspect-[2/1] border-2 border-dashed border-slate-700 rounded-lg text-slate-600 hover:border-slate-500 hover:text-slate-400 transition-colors duration-300"
+                      aria-label="Añadir logo de patrocinador"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
                 </div>
             </AnimatedContent>
         </section>
