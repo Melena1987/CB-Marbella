@@ -13,7 +13,7 @@ interface GalleryImage {
 interface GalleryItem {
   id: string;
   title: string;
-  images: GalleryImage[];
+  images: (GalleryImage | string)[];
   createdAt: Timestamp;
   slug: string;
 }
@@ -89,22 +89,25 @@ const GalleryDetailPage: React.FC = () => {
         </AnimatedContent>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {gallery.images.map((img, index) => (
-            <AnimatedContent key={index} style={{ animationDelay: `${index * 50}ms` }}>
-              <div 
-                className="aspect-square bg-[#061121] rounded-lg overflow-hidden cursor-pointer group"
-                onClick={() => openLightbox(index)}
-                >
-                <img src={img.thumbnail} alt={`${gallery.title} - ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
-              </div>
-            </AnimatedContent>
-          ))}
+          {gallery.images.map((img, index) => {
+            const thumbnailUrl = typeof img === 'object' ? img.thumbnail || img.original : img;
+            return (
+              <AnimatedContent key={index} style={{ animationDelay: `${index * 50}ms` }}>
+                <div 
+                  className="aspect-square bg-[#061121] rounded-lg overflow-hidden cursor-pointer group"
+                  onClick={() => openLightbox(index)}
+                  >
+                  <img src={thumbnailUrl} alt={`${gallery.title} - ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                </div>
+              </AnimatedContent>
+            );
+          })}
         </div>
       </div>
       
       {lightboxOpen && (
           <Lightbox 
-            images={gallery.images.map(img => img.original)}
+            images={gallery.images.map(img => typeof img === 'object' ? img.original : img)}
             selectedIndex={selectedImage}
             onClose={() => setLightboxOpen(false)}
             onNext={() => setSelectedImage((prev) => (prev + 1) % gallery.images.length)}
