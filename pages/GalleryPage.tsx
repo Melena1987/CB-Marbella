@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AnimatedContent from '../components/AnimatedContent';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -14,7 +15,7 @@ interface GalleryItem {
 
 // --- Card Component for Displaying a Gallery ---
 const GalleryCard: React.FC<{ item: GalleryItem }> = ({ item }) => (
-    <div className="block group overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
+    <Link to={`/galeria/${item.id}`} className="block group overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
       <div className="overflow-hidden aspect-square">
         <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
       </div>
@@ -22,7 +23,7 @@ const GalleryCard: React.FC<{ item: GalleryItem }> = ({ item }) => (
         <h3 className="text-2xl font-bold text-white font-['Teko'] mb-1 leading-tight truncate">{item.title}</h3>
         <p className="text-sm text-[#003782] font-semibold">{item.images.length} {item.images.length === 1 ? 'foto' : 'fotos'}</p>
       </div>
-    </div>
+    </Link>
 );
 
 // --- Main Gallery Page Component ---

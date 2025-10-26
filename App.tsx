@@ -14,6 +14,7 @@ import RosterPage from './pages/RosterPage';
 import LegalPage from './pages/LegalPage';
 import FacilitiesPage from './pages/FacilitiesPage';
 import GalleryPage from './pages/GalleryPage';
+import GalleryDetailPage from './pages/GalleryDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
             <Route path="/instalaciones" element={<FacilitiesPage />} />
             <Route path="/plantilla" element={<RosterPage />} />
             <Route path="/galeria" element={<GalleryPage />} />
+            <Route path="/galeria/:galleryId" element={<GalleryDetailPage />} />
             <Route path="/abonate" element={<SubscribePage />} />
             <Route path="/patrocinio" element={<SponsorshipPage />} />
             <Route path="/contacto" element={<ContactPage />} />
