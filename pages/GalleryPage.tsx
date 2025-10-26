@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimatedContent from '../components/AnimatedContent';
+import { auth } from '../firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import LoginModal from '../components/LoginModal';
 
 interface GalleryItem {
   id: number;
@@ -102,7 +105,16 @@ const GalleryCard: React.FC<{ item: GalleryItem }> = ({ item }) => (
 // --- Main Gallery Page Component ---
 const GalleryPage: React.FC = () => {
     const [galleries, setGalleries] = useState<GalleryItem[]>(initialGalleries);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleCreateGallery = (title: string, files: FileList) => {
         const imageUrls = Array.from(files).map(file => URL.createObjectURL(file));
@@ -114,19 +126,31 @@ const GalleryPage: React.FC = () => {
         setGalleries(prev => [newGallery, ...prev]);
     };
 
+    const handleAddGalleryClick = () => {
+        if (user) {
+            setIsCreateModalOpen(true);
+        } else {
+            setIsLoginModalOpen(true);
+        }
+    };
+
     return (
         <div className="pt-24 pb-16 bg-[#0a192f] min-h-screen">
             <CreateGalleryModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
                 onCreate={handleCreateGallery}
+            />
+            <LoginModal 
+                isOpen={isLoginModalOpen}
+                onClose={() => setIsLoginModalOpen(false)}
             />
             <div className="container mx-auto px-4">
                 <AnimatedContent className="text-center mb-12">
                     <h1 className="text-6xl md:text-8xl font-extrabold text-white uppercase font-['Teko'] mb-2 tracking-wide">Galería de Fotos</h1>
                     <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-6">Los mejores momentos del club, en imágenes.</p>
                      <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={handleAddGalleryClick}
                         className="inline-flex items-center gap-2 px-6 py-2 border border-slate-600 text-slate-300 rounded-full hover:bg-slate-800 hover:border-slate-500 hover:text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                         aria-label="Crear Nueva Galería"
                     >
