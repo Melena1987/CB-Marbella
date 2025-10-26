@@ -22,8 +22,7 @@ const SubscribePage: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
             <AnimatedContent>
-                {/* Placeholder for the user-provided image */}
-                <img src="https://i.imgur.com/iI3c8m1.png" alt="Carnet de Abonado 2025/26" className="rounded-lg shadow-2xl w-full object-contain" />
+                <img src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2FCB%20Marbella%20carner%20de%20abonado.jpg?alt=media&token=ba8dd06a-1445-4e3e-8725-3427bd18792c" alt="Carnet de Abonado 2025/26" className="rounded-lg shadow-2xl w-full object-contain" />
             </AnimatedContent>
 
             <AnimatedContent>
