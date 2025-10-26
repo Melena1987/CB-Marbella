@@ -113,7 +113,7 @@ const NewsDetailPage: React.FC = () => {
                         <h1 className="text-5xl md:text-6xl font-bold text-white uppercase font-['Teko'] mb-4 leading-tight">{newsItem.title}</h1>
                         <p className="text-slate-400 mb-6">{formattedDate}</p>
 
-                        <img src={newsItem.image} alt={newsItem.title} className="w-full h-auto object-cover rounded-lg shadow-2xl mb-10 aspect-video"/>
+                        <img src={newsItem.image} alt={newsItem.title} className="w-full h-auto object-cover rounded-lg shadow-2xl mb-10 aspect-[4/5] max-h-[80vh]"/>
 
                         <div 
                             className="news-content text-lg text-slate-300"
