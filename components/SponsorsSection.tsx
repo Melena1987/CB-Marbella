@@ -11,15 +11,8 @@ interface Sponsor {
   logoUrl: string;
 }
 
-// Initial sponsors data
-const initialSponsors: Sponsor[] = [
-    { name: 'Hospital Ochoa', logoUrl: 'https://picsum.photos/seed/ochoa/200/100?grayscale' },
-    { name: 'Sponsor 2', logoUrl: 'https://picsum.photos/seed/sponsor2/200/100?grayscale' },
-    { name: 'La Estrellita', logoUrl: 'https://picsum.photos/seed/estrellita/200/100?grayscale' },
-    { name: 'Sponsor 4', logoUrl: 'https://picsum.photos/seed/sponsor4/200/100?grayscale' },
-    { name: 'Kune Fisio', logoUrl: 'https://picsum.photos/seed/kune/200/100?grayscale' },
-    { name: 'Show Time Sport MKT', logoUrl: 'https://picsum.photos/seed/showtime/200/100?grayscale' },
-];
+// Initial sponsors data is now empty
+const initialSponsors: Sponsor[] = [];
 
 const SponsorsSection: React.FC = () => {
   const [sponsors, setSponsors] = useState<Sponsor[]>(initialSponsors);
