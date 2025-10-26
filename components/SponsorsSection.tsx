@@ -23,7 +23,8 @@ const SponsorsSection: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (!currentUser) {
-        setIsLoginModalOpen(false);
+        // Ensure upload modal is closed if user logs out
+        setIsUploadModalOpen(false);
       }
     });
     return () => unsubscribe();
@@ -66,28 +67,26 @@ const SponsorsSection: React.FC = () => {
           <p className="text-slate-400 max-w-2xl mx-auto">Un agradecimiento especial a las empresas que hacen posible nuestro proyecto.</p>
         </AnimatedContent>
         <AnimatedContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-16 gap-y-12 items-center max-w-6xl mx-auto">
             {sponsors.map((sponsor) => (
               <div key={sponsor.id} className="flex justify-center">
                 <img 
                   src={sponsor.logoUrl}
                   alt={sponsor.name} 
-                  className="opacity-60 hover:opacity-100 transition-opacity duration-300 object-contain h-16"
+                  className="opacity-70 hover:opacity-100 transition-opacity duration-300 object-contain h-20 mx-auto"
                 />
               </div>
             ))}
             {/* Add Sponsor Button */}
-            { user && (
-              <button 
-                onClick={handlePlusClick}
-                className="flex items-center justify-center h-full aspect-[2/1] border-2 border-dashed border-slate-700 rounded-lg text-slate-600 hover:border-slate-500 hover:text-slate-400 transition-colors duration-300"
-                aria-label="Añadir logo de patrocinador"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
-            )}
+            <button 
+              onClick={handlePlusClick}
+              className="flex items-center justify-center w-full h-20 bg-transparent border border-slate-800 rounded-lg text-slate-700 hover:border-slate-600 hover:text-slate-500 transition-colors duration-300"
+              aria-label="Añadir logo de patrocinador"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
           </div>
         </AnimatedContent>
       </div>
