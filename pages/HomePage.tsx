@@ -7,18 +7,18 @@ import NewsCard from '../components/NewsCard';
 const HeroSection: React.FC = () => (
   <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
     <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
-    <video
-      autoPlay
-      loop
-      muted
-      playsInline
-      className="absolute z-0 w-auto min-w-full min-h-full max-w-none"
-      poster="https://picsum.photos/seed/cb-marbella-hero/1920/1080"
-    >
-      {/* A royalty-free video could be used here. For now, a static image poster is enough. */}
-    </video>
+    <img
+      src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2FCBMarbella%20portada.jpg?alt=media&token=e1ce8649-fe66-4ef0-8d77-3e420969dfe0"
+      alt="Jugadores del CB Marbella en la cancha"
+      className="absolute z-0 w-full h-full object-cover"
+    />
     <div className="relative z-20 text-center px-4">
       <AnimatedContent>
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/cb-marbella-857d1.firebasestorage.app/o/Recursos%2FCBMarbella%20logo.png?alt=media&token=27643f10-e2f1-47c9-96d6-29afacaae12f"
+          alt="CB Marbella Logo"
+          className="mx-auto mb-4 w-24 h-24 md:w-32 md:h-32"
+        />
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-light tracking-[0.15em] md:tracking-[0.2em] uppercase font-['Teko'] leading-none">
           CBMARBELLA
         </h1>
