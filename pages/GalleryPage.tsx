@@ -1,11 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AnimatedContent from '../components/AnimatedContent';
-import { auth, db } from '../firebase';
+import { auth, db, storage } from '../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
 import LoginModal from '../components/LoginModal';
 import CreateGalleryModal from '../components/CreateGalleryModal';
+import { useAuth } from '../contexts/AuthContext';
+
 
 interface GalleryImage {
   original: string;
@@ -19,33 +23,53 @@ interface GalleryItem {
   images: GalleryImage[]; // Array of image objects
 }
 
+interface GalleryCardProps {
+  item: GalleryItem;
+  user: User | null;
+  onDelete: (item: GalleryItem) => void;
+}
+
 // --- Card Component for Displaying a Gallery ---
-const GalleryCard: React.FC<{ item: GalleryItem }> = ({ item }) => (
-    <Link to={`/galeria/${item.slug}`} className="block group overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
-      <div className="overflow-hidden aspect-square">
-        <img src={item.images[0]?.thumbnail || item.images[0]?.original} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-      </div>
-      <div className="p-5">
-        <h3 className="text-2xl font-bold text-white font-['Teko'] mb-1 leading-tight truncate">{item.title}</h3>
-        <p className="text-sm text-[#003782] font-semibold">{item.images.length} {item.images.length === 1 ? 'foto' : 'fotos'}</p>
-      </div>
-    </Link>
-);
+const GalleryCard: React.FC<GalleryCardProps> = ({ item, user, onDelete }) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(item);
+  };
+
+  return (
+    <div className="relative group/card">
+      <Link to={`/galeria/${item.slug}`} className="block group/link overflow-hidden rounded-lg shadow-lg bg-[#061121] hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1">
+        <div className="overflow-hidden aspect-square">
+          <img src={item.images[0]?.thumbnail || item.images[0]?.original} alt={item.title} className="w-full h-full object-cover group-hover/link:scale-105 transition-transform duration-300" />
+        </div>
+        <div className="p-5">
+          <h3 className="text-2xl font-bold text-white font-['Teko'] mb-1 leading-tight truncate">{item.title}</h3>
+          <p className="text-sm text-[#003782] font-semibold">{item.images.length} {item.images.length === 1 ? 'foto' : 'fotos'}</p>
+        </div>
+      </Link>
+      {user && (
+        <button
+          onClick={handleDelete}
+          className="absolute top-2 right-2 p-1.5 bg-red-600/90 rounded-full text-white opacity-0 group-hover/card:opacity-100 transition-opacity z-10 hover:bg-red-500"
+          aria-label={`Eliminar galería ${item.title}`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+};
+
 
 // --- Main Gallery Page Component ---
 const GalleryPage: React.FC = () => {
     const [galleries, setGalleries] = useState<GalleryItem[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
-
-    // Effect to check auth state
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
+    const { user } = useAuth();
 
     // Effect to fetch galleries from Firestore
     useEffect(() => {
@@ -69,6 +93,42 @@ const GalleryPage: React.FC = () => {
         } else {
             setIsLoginModalOpen(true);
         }
+    };
+    
+    const handleDeleteGallery = async (gallery: GalleryItem) => {
+      if (!window.confirm(`¿Estás seguro de que quieres eliminar la galería "${gallery.title}"? Esta acción no se puede deshacer.`)) {
+        return;
+      }
+
+      try {
+        // Delete all images (original and thumbnail) from Storage
+        const imageDeletePromises = gallery.images.flatMap(img => {
+            const deletePromises = [];
+            
+            // Delete original
+            if (img.original) {
+                const originalRef = ref(storage, img.original);
+                deletePromises.push(deleteObject(originalRef).catch(err => console.error(`Failed to delete original: ${img.original}`, err)));
+            }
+
+            // Delete thumbnail
+            if (img.thumbnail) {
+                const thumbnailRef = ref(storage, img.thumbnail);
+                deletePromises.push(deleteObject(thumbnailRef).catch(err => console.error(`Failed to delete thumbnail: ${img.thumbnail}`, err)));
+            }
+
+            return deletePromises;
+        });
+        
+        await Promise.all(imageDeletePromises);
+
+        // Delete gallery document from Firestore
+        await deleteDoc(doc(db, "galleries", gallery.id));
+
+      } catch (error) {
+        console.error("Error deleting gallery:", error);
+        alert("No se pudo eliminar la galería.");
+      }
     };
 
     return (
@@ -100,7 +160,7 @@ const GalleryPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {galleries.map((item, index) => (
                         <AnimatedContent key={item.id} style={{ animationDelay: `${index * 100}ms` }}>
-                            <GalleryCard item={item} />
+                            <GalleryCard item={item} user={user} onDelete={handleDeleteGallery} />
                         </AnimatedContent>
                     ))}
                 </div>

@@ -1,9 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { collection, query, where, getDocs, Timestamp, limit } from 'firebase/firestore';
-import { db } from '../firebase';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { collection, query, where, getDocs, Timestamp, limit, doc, deleteDoc } from 'firebase/firestore';
+import { db, storage } from '../firebase';
+import { ref, deleteObject } from 'firebase/storage';
 import AnimatedContent from '../components/AnimatedContent';
 import Lightbox from '../components/Lightbox';
+import { useAuth } from '../contexts/AuthContext';
+
 
 interface GalleryImage {
   original: string;
@@ -25,6 +29,8 @@ const GalleryDetailPage: React.FC = () => {
   const [error, setError] = useState('');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -60,6 +66,49 @@ const GalleryDetailPage: React.FC = () => {
       setSelectedImage(index);
       setLightboxOpen(true);
   }
+  
+  const handleDeleteGallery = async () => {
+    if (!gallery) return;
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar la galería "${gallery.title}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const imagesToDelete = gallery.images;
+
+      // Delete all images (original and thumbnail) from Storage
+      const imageDeletePromises = imagesToDelete.flatMap(img => {
+          const originalUrl = typeof img === 'object' ? img.original : img;
+          const thumbnailUrl = typeof img === 'object' ? img.thumbnail : null;
+          
+          const deletePromises = [];
+          
+          if (originalUrl) {
+              const originalRef = ref(storage, originalUrl);
+              deletePromises.push(deleteObject(originalRef).catch(err => console.error(`Failed to delete original: ${originalUrl}`, err)));
+          }
+
+          if (thumbnailUrl) {
+              const thumbnailRef = ref(storage, thumbnailUrl);
+              deletePromises.push(deleteObject(thumbnailRef).catch(err => console.error(`Failed to delete thumbnail: ${thumbnailUrl}`, err)));
+          }
+
+          return deletePromises;
+      });
+      
+      await Promise.all(imageDeletePromises);
+
+      // Delete gallery document from Firestore
+      await deleteDoc(doc(db, "galleries", gallery.id));
+      
+      // Navigate back to the gallery list
+      navigate('/galeria');
+
+    } catch (error) {
+      console.error("Error deleting gallery:", error);
+      alert("No se pudo eliminar la galería.");
+    }
+  };
 
   if (loading) {
     return <div className="text-center pt-32">Cargando galería...</div>;
@@ -78,7 +127,20 @@ const GalleryDetailPage: React.FC = () => {
       <div className="container mx-auto px-4">
         <AnimatedContent>
           <div className="text-center mb-12">
-            <Link to="/galeria" className="text-sm text-slate-400 hover:text-white mb-4 inline-block">&larr; Volver a todas las galerías</Link>
+            <div className="flex justify-center items-center gap-4 mb-4">
+              <Link to="/galeria" className="text-sm text-slate-400 hover:text-white inline-block">&larr; Volver a todas las galerías</Link>
+              {user && (
+                <button 
+                  onClick={handleDeleteGallery}
+                  className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-3 rounded-full transition-colors flex items-center gap-1"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                  </svg>
+                  <span>Eliminar</span>
+                </button>
+              )}
+            </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white uppercase font-['Teko'] mb-2">{gallery.title}</h1>
             <p className="text-slate-400">
                 {gallery.createdAt?.toDate().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}

@@ -1,10 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import AnimatedContent from './AnimatedContent';
 import LoginModal from './LoginModal';
 import UploadLogoModal from './UploadLogoModal';
-import { auth, db } from '../firebase';
+import { auth, db, storage } from '../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
+import { useAuth } from '../contexts/AuthContext';
+
 
 // Define the type for a sponsor fetched from Firestore
 interface Sponsor {
@@ -24,13 +28,15 @@ const SponsorsSection: React.FC = () => {
   const [officialSponsors, setOfficialSponsors] = useState<Sponsor[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
+  
+  // Local user state to avoid dependency on useAuth in onAuthStateChanged
+  const [localUser, setLocalUser] = useState<User | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      setLocalUser(currentUser);
       if (!currentUser) {
-        // Ensure upload modal is closed if user logs out
         setIsUploadModalOpen(false);
       }
     });
@@ -65,6 +71,25 @@ const SponsorsSection: React.FC = () => {
       setIsLoginModalOpen(true);
     }
   };
+  
+  const handleDeleteSponsor = async (sponsor: Sponsor) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar el logo de "${sponsor.name}"?`)) {
+      return;
+    }
+
+    try {
+      // Delete from Firestore
+      await deleteDoc(doc(db, "sponsors", sponsor.id));
+
+      // Delete from Storage
+      const logoRef = ref(storage, sponsor.logoUrl);
+      await deleteObject(logoRef);
+      
+    } catch (error) {
+      console.error("Error deleting sponsor: ", error);
+      alert("No se pudo eliminar el patrocinador.");
+    }
+  };
 
   return (
     <section className="py-12 md:py-20 bg-[#0a192f]">
@@ -80,7 +105,7 @@ const SponsorsSection: React.FC = () => {
             <AnimatedContent className="mb-12 md:mb-16">
                  <div className="flex justify-center items-start gap-12 md:gap-20 flex-wrap">
                     {mainSponsors.map((sponsor) => (
-                        <div key={sponsor.id} className="flex flex-col items-center gap-3">
+                        <div key={sponsor.id} className="relative group flex flex-col items-center gap-3">
                              <p className="text-center text-sm uppercase tracking-widest text-slate-400">
                                 {sponsor.logoUrl === namingSponsorUrl && 'Naming Sponsor'}
                                 {sponsor.logoUrl === mainSponsorUrl && 'Main Sponsor'}
@@ -90,6 +115,17 @@ const SponsorsSection: React.FC = () => {
                             alt={sponsor.name} 
                             className="opacity-90 hover:opacity-100 transition-opacity duration-300 object-contain h-40 md:h-48 mx-auto"
                             />
+                            {user && (
+                              <button
+                                onClick={() => handleDeleteSponsor(sponsor)}
+                                className="absolute -top-2 -right-2 p-1.5 bg-red-600/90 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-500"
+                                aria-label={`Eliminar ${sponsor.name}`}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -103,12 +139,23 @@ const SponsorsSection: React.FC = () => {
         <AnimatedContent>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-16 gap-y-12 items-center max-w-6xl mx-auto">
             {officialSponsors.map((sponsor) => (
-              <div key={sponsor.id} className="flex justify-center">
+              <div key={sponsor.id} className="relative group flex justify-center">
                 <img 
                   src={sponsor.logoUrl}
                   alt={sponsor.name} 
                   className="opacity-70 hover:opacity-100 transition-opacity duration-300 object-contain h-20 mx-auto"
                 />
+                {user && (
+                    <button
+                      onClick={() => handleDeleteSponsor(sponsor)}
+                      className="absolute -top-2 -right-2 p-1.5 bg-red-600/90 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-500"
+                      aria-label={`Eliminar ${sponsor.name}`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
               </div>
             ))}
             {/* Add Sponsor Button */}
