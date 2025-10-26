@@ -1,14 +1,18 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { storage, db } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 interface UploadLogoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (files: File[]) => void;
 }
 
-const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUpload }) => {
+const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -29,7 +33,6 @@ const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUp
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        // FIX: The `file` parameter needs to be typed to access its `type` property.
         const newFiles = Array.from(e.dataTransfer.files).filter((file: any) => file.type.startsWith('image/'));
         setFiles(prev => [...prev, ...newFiles]);
     }
@@ -37,7 +40,6 @@ const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUp
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-        // FIX: The `file` parameter needs to be typed to access its `type` property.
         const newFiles = Array.from(e.target.files).filter((file: any) => file.type.startsWith('image/'));
         setFiles(prev => [...prev, ...newFiles]);
     }
@@ -47,11 +49,35 @@ const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUp
     setFiles(files.filter(file => file.name !== fileName));
   };
   
-  const handleUpload = () => {
-    if (files.length > 0) {
-        onUpload(files);
-        setFiles([]);
-        onClose();
+  const handleUpload = async () => {
+    if (files.length === 0) return;
+    setIsUploading(true);
+
+    try {
+      const sponsorsCollection = collection(db, 'sponsors');
+      
+      const uploadPromises = files.map(async (file) => {
+        const storageRef = ref(storage, `sponsors/${Date.now()}-${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        await addDoc(sponsorsCollection, {
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          logoUrl: downloadURL,
+          createdAt: serverTimestamp()
+        });
+      });
+
+      await Promise.all(uploadPromises);
+
+      setFiles([]);
+      onClose();
+
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      alert("Hubo un error al subir los logos. Por favor, inténtalo de nuevo.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -61,7 +87,6 @@ const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUp
       url: URL.createObjectURL(file)
   })), [files]);
 
-  // Cleanup object URLs on unmount or when files change
   React.useEffect(() => {
     return () => {
       filePreviews.forEach(file => URL.revokeObjectURL(file.url));
@@ -114,10 +139,10 @@ const UploadLogoModal: React.FC<UploadLogoModalProps> = ({ isOpen, onClose, onUp
 
         <button
             onClick={handleUpload}
-            disabled={files.length === 0}
+            disabled={files.length === 0 || isUploading}
             className="w-full mt-8 bg-gradient-to-r from-[#003782] to-[#002966] hover:from-[#002966] hover:to-[#003782] text-white font-bold py-3 px-4 rounded-full text-lg uppercase tracking-wider transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-            Subir {files.length > 0 ? `${files.length} logo${files.length > 1 ? 's' : ''}` : 'Logos'}
+            {isUploading ? 'Subiendo...' : `Subir ${files.length > 0 ? `${files.length} logo${files.length > 1 ? 's' : ''}` : 'Logos'}`}
         </button>
       </div>
     </div>
